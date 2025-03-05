@@ -473,3 +473,211 @@ raw_data.corr(): Creates a matrix showing the correlation between all numerical 
 raw_data.corr()['tip_amount']: Extracts just the correlations for 'tip_amount' with all the other columns.  
 
  
+![image](https://github.com/user-attachments/assets/c8ed76ae-eefe-4ee8-831f-890908295a42)
+
+## Dataset Preprocessing
+``` python
+# extract the labels from the dataframe
+y = raw_data[['tip_amount']].values.astype('float32')
+
+# drop the target variable from the feature matrix
+proc_data = raw_data.drop(['tip_amount'], axis=1)
+
+# get the feature matrix used for training
+X = proc_data.values
+
+# normalize the feature matrix
+X = normalize(X, axis=1, norm='l1', copy=False)
+```
+
+## Dataset Train/Test Split
+
+```python
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+```
+## Build a Decision Tree Regressor model with Scikit-Learn
+
+criterion: The function used to measure error, we use 'squared_error'.  
+
+max_depth - The maximum depth the tree is allowed to take; we use 8.
+
+```python
+# import the Decision Tree Regression Model from scikit-learn
+from sklearn.tree import DecisionTreeRegressor
+
+# for reproducible output across multiple function calls, set random_state to a given integer value
+dt_reg = DecisionTreeRegressor(criterion = 'squared_error',
+                               max_depth=8, 
+                               random_state=35)
+dt_reg.fit(X_train, y_train)
+```
+
+## valuate the Scikit-Learn and Snap ML Decision Tree Regressor Models¶
+
+```python
+# run inference using the sklearn model
+y_pred = dt_reg.predict(X_test)
+
+# evaluate mean squared error on the test dataset
+mse_score = mean_squared_error(y_test, y_pred)
+print('MSE score : {0:.3f}'.format(mse_score))
+
+r2_score = dt_reg.score(X_test,y_test)
+print('R^2 score : {0:.3f}'.format(r2_score))
+```
+## Credit Card Fraud Detection with Decision Trees and SVM
+
+```python
+# get the set of distinct classes which is [0,1]
+labels = raw_data.Class.unique()
+# get the count of each class , gives [284315, 492]
+sizes = raw_data.Class.value_counts().values
+
+# plot the class value counts
+fig, ax = plt.subplots()
+ax.pie(sizes, labels=labels, autopct='%1.3f%%')
+ax.set_title('Target Variable Value Counts')
+plt.show()
+
+```
+![image](https://github.com/user-attachments/assets/9eaa3fd4-f8f4-458d-80dc-85b20419bb39)
+As shown above, the Class variable has two values: 0 (the credit card transaction is legitimate) and 1 (the credit card transaction is fraudulent). The dataset is highly unbalanced, the target variable classes are not represented equally (more 0s than 1) sorequires special attention. We can bias the model to pay more attention to the samples in the minority class. 
+
+We need to see what feature has an impact on the classes.
+
+``` python
+correlation_values = raw_data.corr()['Class'].drop('Class')
+correlation_values.plot(kind='barh', figsize=(10, 6))
+```
+![image](https://github.com/user-attachments/assets/ed8285b5-c87f-4e14-b333-75320e2cca85)
+
+## Dataset Preprocessing
+
+SVM maximises the margin between different classes using a hyperplane.
+
+If the features have vastly different scales (e.g., one feature ranges from 0 to 1 and another ranges from 1000 to 10000), then the feature with a larger range will dominate the calculation of distances. This could cause the model to give too much importance to one feature and overlook others.
+
+Standard Scaling adjusts the features so that they all have the same scale, typically with a mean of 0 and standard deviation of 1. This ensures that features with very large or very small scales don't dominate the distance calculation.
+Normalization (e.g., L1 or L2 normalization) rescales the features to have a unit norm (sum of absolute values = 1 or sum of squared values = 1). This ensures that no feature has more impact on the model than another simply because of its scale.
+
+### Example Dataset
+
+| Feature1 | Feature2 |
+|----------|----------|
+| 1000     | 0.5      |
+| 2000     | 1.5      |
+| 3000     | 2.5      |
+
+---
+
+### After Standard Scaling:
+
+| Feature1 (Scaled) | Feature2 (Scaled) |
+|-------------------|-------------------|
+| -1.0              | -1.0              |
+| 0.0               | 0.0               |
+| 1.0               | 1.0               |
+
+---
+
+### After L1 Normalization:
+
+| Feature1 (Norm) | Feature2 (Norm) |
+|-----------------|-----------------|
+| 0.9995          | 0.0005          |
+| 0.9990          | 0.0010          |
+| 0.9990          | 0.0015          |
+
+
+``` python
+
+#removing the last column which are the "classes" by indexing.
+# assigning it by indexing it like this over writes the raw_data instead of calling it by a new variable.
+raw_data.iloc[:, 1:30] = StandardScaler().fit_transform(raw_data.iloc[:, 1:30])
+data_matrix = raw_data.values
+
+# X: feature matrix (for this analysis, we exclude the Time variable from the dataset)
+X = data_matrix[:, 1:30]
+
+# y: labels vector
+y = data_matrix[:, 30]
+
+# data normalization
+X = normalize(X, norm="l1")
+
+```
+## Dataset Train/Test Split
+
+``` python
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+
+```
+## Build a Decision Tree Classifier model with Scikit-Learn
+
+```python
+
+w_train = compute_sample_weight('balanced', y_train)
+
+# for reproducible output across multiple function calls, set random_state to a given integer value
+dt = DecisionTreeClassifier(max_depth=4, random_state=35)
+
+dt.fit(X_train, y_train, sample_weight=w_train)
+
+```
+
+### Example: Using `compute_sample_weight('balanced')`
+Assume we have the following target labels for a dataset:
+
+y_train = [0, 0, 0, 0, 1, 1, 1]  
+Class 0 appears 4 times.  
+Class 1 appears 3 times.  
+Now, calling compute_sample_weight('balanced', y_train) will compute the weights as follows:
+
+Total number of samples = 7  
+Number of classes = 2  
+Number of samples in class 0 = 4  
+Number of samples in class 1 = 3  
+The weight for class 0 will be:  
+
+weight for class 0 = 7 / (2 * 4) = 0.875  
+The weight for class 1 will be:  
+
+weight for class 1 = 7 / (2 * 3) = 1.1667  
+Thus, the weights for each sample will be:  
+
+Samples with label 0 will have a weight of 0.875.  
+Samples with label 1 will have a weight of 1.1667.  
+Now, the model will train using these sample weights, so it will "pay more attention" to the underrepresented class 1.  
+
+## Build a Support Vector Machine model with Scikit-Learn
+
+``` python
+
+# for reproducible output across multiple function calls, set random_state to a given integer value
+svm = LinearSVC(class_weight='balanced', random_state=31, loss="hinge", fit_intercept=False)
+
+svm.fit(X_train, y_train)
+```
+## Evaluate the Decision Tree Classifier Models
+
+```python
+y_pred_dt = dt.predict_proba(X_test)[:,1]
+
+# ROC-AUC - Receiver Operating Characteristic Curve, higher the value better the seperation of classes is
+roc_auc_dt = roc_auc_score(y_test, y_pred_dt)
+print('Decision Tree ROC-AUC score : {0:.3f}'.format(roc_auc_dt))
+
+```
+## Evaluate the Support Vector Machine Models
+
+```python
+
+y_pred_svm = svm.decision_function(X_test)
+
+roc_auc_svm = roc_auc_score(y_test, y_pred_svm)
+print("SVM ROC-AUC score: {0:.3f}".format(roc_auc_svm))
+
+```
+
+
+
