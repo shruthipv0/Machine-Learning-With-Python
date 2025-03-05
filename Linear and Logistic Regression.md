@@ -429,6 +429,8 @@ plt.xticks(rotation=45)  # Rotate labels for better readability if needed
 plt.show()
 
 ```
+![image](https://github.com/user-attachments/assets/9e2c25b9-de65-4d12-b58f-06fa5cd37d3d)
+
 
 ## Modeling
 
@@ -456,3 +458,6 @@ plot_tree(drugTree)
 plt.show()
 
 ```
+
+![image](https://github.com/user-attachments/assets/0dfcdfc1-d30b-4e16-86bc-54560f86d902)
+
