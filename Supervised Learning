@@ -465,4 +465,11 @@ plt.show()
 
  The dataset includes information about taxi tip and we will use the trained model to predict the amount of tip paid.
 
+``` python
+correlation_values = raw_data.corr()['tip_amount'].drop('tip_amount')
+correlation_values.plot(kind='barh', figsize=(10, 6))
+```
+raw_data.corr(): Creates a matrix showing the correlation between all numerical columns.   
+raw_data.corr()['tip_amount']: Extracts just the correlations for 'tip_amount' with all the other columns.  
+
  
