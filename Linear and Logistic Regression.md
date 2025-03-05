@@ -461,3 +461,8 @@ plt.show()
 
 ![image](https://github.com/user-attachments/assets/0dfcdfc1-d30b-4e16-86bc-54560f86d902)
 
+# Regression Trees
+
+ The dataset includes information about taxi tip and we will use the trained model to predict the amount of tip paid.
+
+ 
