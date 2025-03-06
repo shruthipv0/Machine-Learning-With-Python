@@ -1,5 +1,7 @@
 # Linear Regression with Scikit-Learn
 
+![image](https://github.com/user-attachments/assets/e6abfcec-31fc-4e1f-9560-dd002f2cb23a)
+
 ## Importing Required Libraries
 ```python
 import numpy as np
@@ -60,6 +62,8 @@ print("R2 Score: %.2f" % r2_score(y_test, y_test_pred))
 ```
 
 # Classification with Logistic Regression
+
+![image](https://github.com/user-attachments/assets/f5c5da43-44c2-49dd-b9eb-0d93f4a83579)
 
 ## Predicting Customer Churn
 
@@ -143,6 +147,8 @@ log_loss(y_test, yhat_prob)
 ```
 # Multi-class Classification
 
+![image](https://github.com/user-attachments/assets/35eaf889-31fc-4836-b076-c7dad18dfa33)
+
 ## Importing Required Libraries
 ```python
 import pandas as pd
@@ -214,6 +220,8 @@ scaled_data = pd.concat([data.drop(columns=continuous_columns), scaled_df], axis
 Now that we have the normalised/scaled data, we want to add this back into our original data with these scaled values. so we take the original data, drop the unscaled columns and concat it with the scaled column. Note axis = 1 means concat it by column side bt side 
 
 # One-hot encoding
+
+[image](https://github.com/user-attachments/assets/a0756306-ff15-4f8d-ab47-0920b6051bc4)
 
 Convert categorical variables into numerical format using one-hot encoding.
 
@@ -373,6 +381,8 @@ print(f"Accuracy: {np.round(100*accuracy_score(y_test, y_pred_ovo),2)}%")
 ```
 ## Decision Trees
 
+![image](https://github.com/user-attachments/assets/89b39a83-6ae5-47b6-98ea-80af2dca96f9)
+
 Part of your job is to build a model to find out which drug might be appropriate for a future patient with the same illness. The features of this dataset are the Age, Sex, Blood Pressure, and Cholesterol of the patients, and the target is the drug that each patient responded to.During their course of treatment, each patient responded to one of 5 medications, Drug A, Drug B, Drug C, Drug X and Drug Y.
 
 ``` python
@@ -405,6 +415,10 @@ my_data.drop('Drug', axis=1): Removing the 'Drug' column.
 ```
 
 ### Correlation Matrix Example
+
+
+![image](https://github.com/user-attachments/assets/3a91fda4-0373-4721-8b83-b2e0753accfb)
+
 
 |                   | Age   | Blood Pressure | Drug_num |
 |-------------------|-------|----------------|----------|
@@ -678,6 +692,139 @@ roc_auc_svm = roc_auc_score(y_test, y_pred_svm)
 print("SVM ROC-AUC score: {0:.3f}".format(roc_auc_svm))
 
 ```
+
+# K-Nearest Neighbors Classifier
+
+![image](https://github.com/user-attachments/assets/e93719b8-a934-4b9b-ab84-cf9ac2fc6279)
+
+## Telecommunications customer Classification
+
+``` python
+# Finding which features have the highest co relation with customer class
+correlation_values = abs(df.corr()['custcat'].drop('custcat')).sort_values(ascending=False)
+```
+
+Output shows retire and gender have the least effect on custcat while ed and tenure have the most effect.
+
+## Data preprocessing 
+
+``` python
+
+# Getting X and y values from data
+X = df.drop('custcat',axis=1)
+y = df['custcat']
+
+# Normalising data
+X_norm = StandardScaler().fit_transform(X)
+
+#Train test split
+X_train, X_test, y_train, y_test = train_test_split(X_norm, y, test_size=0.2, random_state=4)
+
+#KNN classification
+k = 3
+#Train Model and Predict  
+knn_classifier = KNeighborsClassifier(n_neighbors=k)
+knn_model = knn_classifier.fit(X_train,y_train)
+
+#Predict
+yhat = knn_model.predict(X_test)
+
+#Accuracy
+print("Test set Accuracy: ", accuracy_score(y_test, yhat))
+
+```
+
+## Choosing the correct value of k
+
+We need the correct value of k for accuracy so we train the model for a different sets of k and check the accuracy to see which value of k is best.
+
+``` python
+
+Ks = 10
+#Array to store accuracy values for each K
+acc = np.zeros((Ks))
+
+#Array to store standard deviation of accuracy
+std_acc = np.zeros((Ks))
+
+for n in range(1,Ks+1):
+    #Train Model and Predict  
+    knn_model_n = KNeighborsClassifier(n_neighbors = n).fit(X_train,y_train)
+    yhat = knn_model_n.predict(X_test)
+
+    #Accuracy stored in the index n-1
+    acc[n-1] = accuracy_score(y_test, yhat)
+    std_acc[n-1] = np.std(yhat==y_test)/np.sqrt(yhat.shape[0])
+
+#Plotting the accuracy of each k
+
+plt.plot(range(1,Ks+1),acc,'g')
+plt.fill_between(range(1,Ks+1),acc - 1 * std_acc,acc + 1 * std_acc, alpha=0.10)
+plt.legend(('Accuracy value', 'Standard Deviation'))
+plt.ylabel('Model Accuracy')
+plt.xlabel('Number of Neighbors (K)')
+plt.tight_layout()
+plt.show()
+
+print( "The best accuracy was with", acc.max(), "with k =", acc.argmax()+1)
+
+#Outputs k = 9
+```
+![image](https://github.com/user-attachments/assets/f980cc7e-c915-4ccb-abbc-3047220185eb)
+
+## Comparing Random Forest and XGBoost modeling performance
+
+### Random Forest
+
+![image](https://github.com/user-attachments/assets/baa384c4-f9d8-423f-b860-13fc2442602c)
+
+
+- Random forest model is used for both __classification__ and __regression__.
+- Creates a forest of __decision trees__ (many independent decision trees).
+- For classification, majority vote from all the trees is taken.
+- For regression, average values predicted by all the trees is taken.
+
+![image](https://github.com/user-attachments/assets/74d35a4e-0ede-47aa-b51f-b96ccbe3c349)
+
+## XGB Boost (extreme gradient boosting)
+
+- Builds decision tree and learns what mistakes it has made and creates a new one and improved one.
+- Builds trees sequentially.
+- Builds a tree, calculates the accuracy (test, predict), builds another tree correcting these errors.
+
+### Comparison: Random Forest vs XGBoost
+
+| Feature               | Random Forest 🌲               | XGBoost ⚡                      |
+|----------------------|--------------------------------|--------------------------------|
+| **Tree Building**    | Parallel (many trees at once)  | Sequential (one tree at a time) |
+| **Speed**           | Slower                         | Faster (optimised)             |
+| **Accuracy**        | Good                           | Often better                   |
+| **Handles Missing Data** | No (needs preprocessing)  | Yes (automatically handles)     |
+| **Overfitting**      | Can overfit                   | Less likely to overfit         |
+
+```python
+# Initialize models
+n_estimators=100
+rf = RandomForestRegressor(n_estimators=n_estimators, random_state=42)
+xgb = XGBRegressor(n_estimators=n_estimators, random_state=42)
+
+# Fit models
+# Measure how long it takes to train Random Forest
+start_time_rf = time.time()
+rf.fit(X_train, y_train)
+end_time_rf = time.time()
+rf_train_time = end_time_rf - start_time_rf
+
+# Measure how long it takes to train XGBoost
+start_time_xgb = time.time()
+xgb.fit(X_train, y_train)
+end_time_xgb = time.time()
+xgb_train_time = end_time_xgb - start_time_xgb
+
+print(rf_train_time,xgb_train_time)
+
+#Outputs 17.46025276184082 0.29244160652160645 . So Xgb takes shortest time to train
+
 
 
 
