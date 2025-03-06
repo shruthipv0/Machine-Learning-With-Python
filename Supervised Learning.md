@@ -826,27 +826,5 @@ xgb_train_time = end_time_xgb - start_time_xgb
 print(rf_train_time,xgb_train_time)
 
 #Outputs 17.46025276184082 0.29244160652160645 . So Xgb takes shortest time to train
-
 ```
-# K-means Clustering
-
-## K-Means on a synthetic data set
-
-Creating synthetic data set using random.seed, make_blobs.
-
-- random.seed : initialising random seed ensures the output of the random number generated will always be the same.
-- make_blobs : creates synthetic __clustered data__ (used for testing k means usually).
-
-```python
-np.random.seed(0)
-
-#centers = no of distinct clusters
-X, y = make_blobs(n_samples=5000, centers=[[4,4], [-2, -1], [2, -3], [1, 1]], cluster_std=0.9)
-
-#visualising the clusers
-plt.scatter(X[:, 0], X[:, 1], marker='.',alpha=0.3,ec='k',s=80)
-```
-![image](https://github.com/user-attachments/assets/00122f77-df39-40d5-91d4-13dba3c1e07c)
-
-## Setting up k-means
 
